@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Reservacion Pickpup</title>
+	<style>
+		body{
+			background-color: aliceblue;
+			color: Black;
+		}
+		form{
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		img{
+			border-radius: 50px;
+			display: flex;
+			margin-left: 520px;
+		}	
+	</style>
+</head>
+<body>
+<img src="./Global Cargo.png" alt="Global Cargo">
+<br>	
+<form id="reservation-form">
+  <label for="name">Nombre y Apellido:</label>
+  <input type="text" id="name" name="name" required>
+  <br>
+  <label for="address">Dirección Exacta:</label>
+  <input type="text" id="address" name="address" required>
+   <br>
+<label for="comuna">Comuna:</label>
+  <select id="comuna" name="comuna" required>
+    <option value="" selected disabled>Selecciona una comuna</option>
+    <option value="Cerrillos">Cerrillos</option>
+    <option value="Cerro Navia">Cerro Navia</option>
+    <option value="Conchalí">Conchalí</option>
+    <option value="El Bosque">El Bosque</option>
+    <option value="Estación Central">Estación Central</option>
+    <option value="Huechuraba">Huechuraba</option>
+    <option value="Independencia">Independencia</option>
+    <option value="La Cisterna">La Cisterna</option>
+    <option value="La Florida">La Florida</option>
+    <option value="La Granja">La Granja</option>
+    <option value="La Pintana">La Pintana</option>
+    <option value="La Reina">La Reina</option>
+    <option value="Las Condes">Las Condes</option>
+    <option value="Lo Barnechea">Lo Barnechea</option>
+    <option value="Lo Espejo">Lo Espejo</option>
+    <option value="Lo Prado">Lo Prado</option>
+    <option value="Macul">Macul</option>
+    <option value="Maipú">Maipú</option>
+    <option value="Ñuñoa">Ñuñoa</option>
+    <option value="Pedro Aguirre Cerda">Pedro Aguirre Cerda</option>
+    <option value="Peñalolén">Peñalolén</option>
+    <option value="Providencia">Providencia</option>
+    <option value="Pudahuel">Pudahuel</option>
+    <option value="Quilicura">Quilicura</option>
+    <option value="Quinta Normal">Quinta Normal</option>
+    <option value="Recoleta">Recoleta</option>
+    <option value="Renca">Renca</option>
+    <option value="San Joaquín">San Joaquín</option>
+    <option value="San Miguel">San Miguel</option>
+    <option value="San Ramón">San Ramón</option>
+    <option value="Santiago">Santiago</option>
+    <option value="Vitacura">Vitacura</option>
+  </select>
+   <br>
+   <label for="telefono1">Teléfono 1:</label>
+  <input type="text" id="telefono1" name="telefono1" required>
+   <br>
+  <label for="telefono2">Teléfono 2:</label>
+  <input type="text" id="telefono2" name="telefono2" required>
+ <br>
+
+
+  <label for="delivery-time">Fecha y hora de entrega:</label>
+  <input type="datetime-local" id="delivery-time" name="delivery-time" required>
+   <br>
+<label for="servicio">Tipo de Servicio:</label>
+  <select id="servicio" name="servicio" required>
+ <option value="" selected disabled>Selecciona una Opción</option>
+    <option value="vacias">Llevar cajas vacias</option>
+    <option value="llenas">Retirar cajas Llenas</option>
+    <option value="Ambas">Ambas</option>
+   </select>
+    <br>
+ <label for="descripcion">Descripcion del pedido:</label>
+ <br>	
+<textarea name="descripcion" id="descripcion" cols="30" rows="10" style="resize:none;"></textarea>
+ <br>
+  <button type="submit">Reservar</button>
+</form>
+
+<script>	
+
+document.getElementById('reservation-form').addEventListener('submit', function(event) {
+  event.preventDefault(); // Evita que se envíe el formulario por defecto
+  
+  // Obtiene los valores del formulario
+  const name = document.getElementById('name').value;
+  const address = document.getElementById('address').value;
+  const comuna=document.getElementById('comuna').value;
+  const deliveryTime = document.getElementById('delivery-time').value;
+  const telefono1=document.getElementById('telefono1').value;
+  const telefono2=document.getElementById('telefono2').value;
+  const servicio=document.getElementById('servicio').value;
+  // Envía los valores al servidor usando fetch
+  fetch('/reservations', {
+    method: 'POST',
+    body: JSON.stringify({ name, address, deliveryTime, comuna, deliveryTime, telefono1, telefono2, servicio}),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert("EL registro fue exitoso")
+  })
+  .catch(error => {
+     alert("Hubo un error")
+  });
+});
+const { google } = require('googleapis');
+const { OAuth2 } = google.auth;
+const oAuth2Client = new OAuth2(
+  '949915095872-g82cth4gjetke8fnm3bsvo7av8rpdleq.apps.googleusercontent.com',
+  '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'
+);
+oAuth2Client.setCredentials({
+  refresh_token: 'https://oauth2.googleapis.com/token'
+});
+
+const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
+
+const createEvent = async (event) => {
+  try {
+    const result = await calendar.events.insert({
+      calendarId: 'primary',
+      resource: event,
+    });
+    console.log(`Evento creado: ${result.data.htmlLink}`);
+  } catch (error) {
+    console.error(`Error creando evento: ${error}`);
+  }
+};
+
+const sendNotification = (event) => {
+  // Código para enviar una notificación al cliente
+};
+
+const createReservation = async (req, res) => {
+  const { name, address, deliveryTime } = req.body;
+
+  const event = {
+    summary: 'Servicio Pickup',
+    location: address,
+    
+</script>
+
+
+
+</body>
+</html>
